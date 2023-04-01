@@ -39,6 +39,12 @@ fn parse_three(input: &str) -> IResult<&str, (&str, &str)> {
     terminated(tuple((parse_td, parse_td)), parse_td)(input)
 }
 
+pub fn parse_span(input: &str) -> IResult<&str, &str> {
+    delimited(tag_no_case("<span>"),
+              parse_content,
+              tag_no_case("</span>"))(input)
+}
+
 pub fn parse_tr(input: &str) -> IResult<&str, (&str, &str)> {
     delimited(
         terminated(tag_no_case("<tr>"), multispace0),
