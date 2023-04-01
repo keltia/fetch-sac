@@ -85,6 +85,15 @@ mod tests {
         assert_eq!(res, r)
     }
 
+    #[rstest]
+    #[case("<span>foo</span>", "foo")]
+    #[case("<span>EU Region</span>", "EU Region")]
+    #[case("<span><strong>foo</strong></span>", "foo")]
+    fn test_parse_span(#[case] input: &str, #[case] res: &str) {
+        let (_, r) = parse_span(input).unwrap();
+        assert_eq!(res, r)
+    }
+
     #[test]
     fn test_parse_two() {
         let input = "<td>foo</td><td>bar</td>";
