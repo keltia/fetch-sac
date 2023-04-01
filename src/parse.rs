@@ -80,7 +80,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_tr() {
+    fn test_parse_tr_0() {
         let input = "<tr><td>foo</td><td>bar</td><td>non</td></tr>";
 
         let r = parse_tr(input);
@@ -93,7 +93,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_tr1() {
+    fn test_parse_tr_1() {
         let input = "<tr>\n\
         <td>foo</td><td>bar</td><td>non</td>\n\
         </tr>";
@@ -108,7 +108,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_tr2() {
+    fn test_parse_tr_2() {
         let input = "<tr>\n\
         <td>foo</td><td>bar</td>\n\
         </tr>";
@@ -123,7 +123,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_tr3() {
+    fn test_parse_tr_3() {
         let input = "<tr>\n\
         <td>foo</td>\n\
         <td>bar</td>\n\
@@ -140,7 +140,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_tr_1() {
+    fn test_parse_tr_4() {
         let input = r##"<tr><td>94</td><td>Vietnam</td><td>1001 0100</td></tr>"##;
 
         let r = parse_tr(input);
@@ -153,7 +153,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_tr_2() {
+    fn test_parse_tr_5() {
         let input = r##"<tr><td>94</td>
         <td>Vietnam</td>
         <td>1001 0100</td>
@@ -169,7 +169,7 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_tr_3() {
+    fn test_parse_tr_6() {
         let input = r##"<tr><th>SAC(Hexa)</th>
     <th>Country/Geographical Area</th>
     <th>Binary Representation</th>
