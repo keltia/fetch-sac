@@ -17,7 +17,7 @@ use scraper::{Html, Selector};
 use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
 use crate::cli::Opts;
-use crate::parse::parse_tr;
+use crate::parse::{parse_header, parse_tr};
 use crate::version::version;
 
 const PAGE: &str = "https://www.eurocontrol.int/asterix";
@@ -66,22 +66,27 @@ fn main() -> Result<()> {
     //
     let doc = Html::parse_document(&doc);
 
+    // Load the different tabs' header
+    //
+    let hdrs = parse_header(&doc)?;
+
     // Get all <table>
     //
     let tables = doc.select(&sel).into_iter();
 
-    // Define a regex to sanitize some data
+    // Define a regex to sanitize some data, don't ask me why some entries have an embedded
+    // <br> or <br />.  Makes no sense to me.
     //
     let re = Regex::new(r##"<br>"##).unwrap();
 
     // Now look into every table.
     //
-    // XXX The 6 tables do not have the same number of cols (aka `<td>`)
-    //
-    tables.for_each(|e| {
+    tables.enumerate().for_each(|(n, e)| {
         // For each line
         //
         debug!("frag={:?}", e.html());
+
+        println!("Table {:?}", hdrs.get(n).unwrap());
 
         // Now we want each <tr>
         //

@@ -1,6 +1,8 @@
 //! nom-based parser for the data we want to extract.
 //!
 
+use anyhow::Result;
+use log::debug;
 use nom::{
     branch::alt,
     bytes::complete::{tag_no_case, take_until},
@@ -8,6 +10,7 @@ use nom::{
     sequence::{delimited, terminated, tuple},
     IResult,
 };
+use scraper::{Html, Selector};
 
 fn parse_content(input: &str) -> IResult<&str, &str> {
     alt((parse_strong, take_until("<")))(input)
@@ -39,7 +42,7 @@ fn parse_three(input: &str) -> IResult<&str, (&str, &str)> {
     terminated(tuple((parse_td, parse_td)), parse_td)(input)
 }
 
-pub fn parse_span(input: &str) -> IResult<&str, &str> {
+fn parse_span(input: &str) -> IResult<&str, &str> {
     delimited(tag_no_case("<span>"),
               parse_content,
               tag_no_case("</span>"))(input)
@@ -51,6 +54,21 @@ pub fn parse_tr(input: &str) -> IResult<&str, (&str, &str)> {
         alt((parse_three, parse_two)),
         terminated(tag_no_case("</tr>"), multispace0),
     )(input)
+}
+
+pub fn parse_header(input: &Html) -> Result<Vec<String>> {
+    let sel = Selector::parse("a > span, [class=field--type-advanced-title]").unwrap();
+    let doc = input.select(&sel).into_iter();
+    let r = doc
+        .filter(|e| !e.html().contains("class"))
+        .map(|e| {
+            let frag = e.html();
+            let (_, r) = parse_span(&frag).unwrap();
+            debug!("{}", r);
+            r.to_owned()
+        })
+        .collect::<Vec<_>>();
+    Ok(r)
 }
 
 #[cfg(test)]
