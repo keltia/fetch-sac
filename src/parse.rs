@@ -50,33 +50,15 @@ pub fn parse_tr(input: &str) -> IResult<&str, (&str, &str)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rstest::rstest;
 
-    #[test]
-    fn test_parse_td() {
-        let input = "<td>foo</td>";
+    #[rstest]
+    #[case("<td>foo</td>", "foo")]
+    #[case("<td><strong>foo</strong></td>", "foo")]
+    #[case("<td><strong>Binary Representation</strong></td>", "Binary Representation")]
+    fn test_parse_td(#[case] input: &str, #[case] res: &str) {
         let (_, r) = parse_td(input).unwrap();
-        assert_eq!("foo", r)
-    }
-
-    #[test]
-    fn test_parse_td_with_strong() {
-        let input = "<td><strong>foo</strong></td>";
-        let (_, r) = parse_td(input).unwrap();
-        assert_eq!("foo", r)
-    }
-
-    #[test]
-    fn test_parse_td_with_strong_1() {
-        let input = "<td><strong>Binary Representation</strong></td>";
-        let (_, r) = parse_td(input).unwrap();
-        assert_eq!("Binary Representation", r)
-    }
-
-    #[test]
-    fn test_parse_th_with_strong_1() {
-        let input = "<th><strong>Binary Representation</strong></th>";
-        let (_, r) = parse_td(input).unwrap();
-        assert_eq!("Binary Representation", r)
+        assert_eq!(res, r)
     }
 
     #[test]
