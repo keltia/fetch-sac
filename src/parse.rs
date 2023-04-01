@@ -1,3 +1,6 @@
+//! nom-based parser for the data we want to extract.
+//!
+
 use nom::{
     branch::alt,
     bytes::complete::{tag_no_case, take_until},
