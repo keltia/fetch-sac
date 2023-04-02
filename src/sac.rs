@@ -4,6 +4,8 @@ use crate::sac::SAC::{Hex, Range};
 
 use serde::{Deserialize, Serialize};
 
+// ----------------------------------
+
 /// Either  regular hex string or a range
 ///
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
@@ -12,40 +14,45 @@ pub enum SAC {
     Hex(String),
     /// Range of code, maybe use a real range type?
     Range(String),
+    /// Guess
+    Empty,
 }
 
 impl SAC {
-    /// Sometimes we have a range and not just a hex number
-    ///  
-    pub fn new(s: &str) -> Self {
-        if s.contains("...") {
-            Range(s.to_owned())
-        } else {
-            Hex(s.to_owned())
-        }
-    }
-}
-
-/// One entry, every `SAC` is in hex
-///
-#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
-pub struct Code {
-    /// Hex value (or range)
-    pub sac: SAC,
-    /// Country or part thereof
-    pub label: String,
-}
-
-impl Code {
-    /// Create a new `Code`
+    /// Create an Empty code
     ///
-    pub fn new(sac: &str, label: &str) -> Self {
-        Code {
-            sac: SAC::new(sac),
-            label: label.to_owned(),
+    pub fn new() -> Self {
+        SAC::Empty
+    }
+}
+
+impl Default for SAC {
+    fn default() -> Self {
+        SAC::new()
+    }
+}
+
+impl From<&str> for SAC {
+    /// Easier to have than direct ::from()
+    ///
+    fn from(value: &str) -> Self {
+        if value.contains("...") {
+            Range(value.to_owned())
+        } else {
+            Hex(value.to_owned())
         }
     }
 }
+
+impl From<usize> for SAC {
+    /// Easier to have than direct ::from()
+    ///
+    fn from(value: usize) -> Self {
+        Hex(format!("{:02X}", value))
+    }
+}
+
+// ----------------------------------
 
 /// One `Area` (group of countries, continent, etc.)
 ///
@@ -54,7 +61,7 @@ pub struct Area {
     /// Name of the area
     pub label: String,
     /// List of codes
-    pub list: HashMap<Code, String>,
+    pub list: HashMap<SAC, String>,
 }
 
 impl Area {
@@ -69,22 +76,54 @@ impl Area {
 
     /// Add a code
     ///
-    pub fn add(&mut self, code: Code, label: &str) -> &mut Self {
-        self.list.insert(code.to_owned(), label.to_owned());
+    pub fn add<T: Into<SAC>>(&mut self, code: T, label: &str) -> &mut Self {
+        self.list.insert(code.into(), label.to_owned());
         self
     }
 }
+
+// ----------------------------------
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use rstest::rstest;
 
+    #[test]
+    fn test_sac_new() {
+        let sac = SAC::new();
+        assert_eq!(SAC::Empty, sac);
+    }
+
     #[rstest]
     #[case("A4", SAC::Hex("A4".to_owned()))]
     #[case("00", SAC::Hex("00".to_owned()))]
     #[case("A0...C3", SAC::Range("A0...C3".to_owned()) )]
-    fn test_sac_new(#[case] num: &str, #[case] sac: SAC) {
-        assert_eq!(sac, SAC::new(num))
+    fn test_sac_from_str(#[case] num: &str, #[case] sac: SAC) {
+        assert_eq!(sac, SAC::from(num))
+    }
+
+    #[rstest]
+    #[case(164, SAC::Hex("A4".to_owned()))]
+    #[case(0, SAC::Hex("00".to_owned()))]
+    fn test_sac_from_usize(#[case] num: usize, #[case] sac: SAC) {
+        assert_eq!(sac, SAC::from(num))
+    }
+
+    #[test]
+    fn test_area_new() {
+        let a = Area::new("foo");
+        assert_eq!("foo", a.label);
+        assert_eq!(HashMap::new(), a.list);
+    }
+
+    #[test]
+    fn test_area_add() {
+        let mut a = Area::new("foo");
+
+        a.add("666", "Hell");
+        assert_eq!("foo", a.label);
+        assert!(a.list.get(&SAC::from("666")).is_some());
+        assert_eq!("Hell", a.list.get(&SAC::from("666")).unwrap());
     }
 }
