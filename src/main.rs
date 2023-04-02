@@ -3,11 +3,6 @@
 //!
 //! XXX The fact that I even have to do this is an utter failure on the Agency side.
 
-pub mod cli;
-pub mod parse;
-pub mod sac;
-pub mod version;
-
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use clap::Parser;
@@ -22,6 +17,11 @@ use crate::parse::{parse_header, parse_tr};
 use crate::sac::Area;
 use crate::version::version;
 
+pub mod cli;
+pub mod parse;
+pub mod sac;
+pub mod version;
+
 const PAGE: &str = "https://www.eurocontrol.int/asterix";
 
 fn main() -> Result<()> {
@@ -35,8 +35,8 @@ fn main() -> Result<()> {
     // Check verbosity
     //
     let lvl = match opts.verbose {
-        0 => Error,
-        1 => Info,
+        0 => Info,
+        1 => Error,
         2 => Debug,
         3 => Trace,
         _ => Trace,
@@ -88,7 +88,7 @@ fn main() -> Result<()> {
         //
         debug!("frag={:?}", e.html());
 
-        println!("Table {:?}", hdrs.get(n).unwrap());
+        info!("Table");
 
         // Now we want each <tr>
         //
