@@ -19,6 +19,7 @@ use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
 use crate::cli::Opts;
 use crate::parse::{parse_header, parse_tr};
+use crate::sac::Area;
 use crate::version::version;
 
 const PAGE: &str = "https://www.eurocontrol.int/asterix";
@@ -94,23 +95,22 @@ fn main() -> Result<()> {
         let sel = Selector::parse("tr").unwrap();
         let iter = e.select(&sel);
 
-        let res: Vec<_> = iter
-            .inspect(|e| debug!("td={e:?}"))
-            .map(|e| {
-                let frag = e.html();
+        let mut area = Area::new(hdrs.get(n).unwrap());
 
-                // Filter
-                //
-                let frag = re.replace_all(&frag, "");
+        iter.inspect(|e| debug!("td={e:?}")).for_each(|e| {
+            let frag = e.html();
 
-                // Get what we want
-                //
-                let (_, (a, b)) = parse_tr(&frag).unwrap();
-                format!("num={} tag={}", a, b)
-            })
-            .collect();
+            // Filter
+            //
+            let frag = re.replace_all(&frag, "");
 
-        println!("res={:?}\n", res);
+            // Get what we want
+            //
+            let (_, (a, b)) = parse_tr(&frag).unwrap();
+            area.add(a, b);
+        });
+
+        println!("area={}\n", area);
     });
     info!("Information retrieved on: {}", today);
     Ok(())
