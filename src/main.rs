@@ -3,10 +3,6 @@
 //!
 //! XXX The fact that I even have to do this is an utter failure on the Agency side.
 
-mod cli;
-mod parse;
-mod version;
-
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use clap::Parser;
@@ -17,8 +13,14 @@ use scraper::{Html, Selector};
 use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
 use crate::cli::Opts;
-use crate::parse::parse_tr;
+use crate::parse::{parse_header, parse_tr};
+use crate::sac::Area;
 use crate::version::version;
+
+pub mod cli;
+pub mod parse;
+pub mod sac;
+pub mod version;
 
 const PAGE: &str = "https://www.eurocontrol.int/asterix";
 
@@ -33,8 +35,8 @@ fn main() -> Result<()> {
     // Check verbosity
     //
     let lvl = match opts.verbose {
-        0 => Error,
-        1 => Info,
+        0 => Info,
+        1 => Error,
         2 => Debug,
         3 => Trace,
         _ => Trace,
@@ -66,45 +68,50 @@ fn main() -> Result<()> {
     //
     let doc = Html::parse_document(&doc);
 
+    // Load the different tabs' header
+    //
+    let hdrs = parse_header(&doc)?;
+
     // Get all <table>
     //
-    let tables = doc.select(&sel).into_iter();
+    let tables = doc.select(&sel);
 
-    // Define a regex to sanitize some data
+    // Define a regex to sanitize some data, don't ask me why some entries have an embedded
+    // <br> or <br />.  Makes no sense to me.
     //
     let re = Regex::new(r##"<br>"##).unwrap();
 
     // Now look into every table.
     //
-    // XXX The 6 tables do not have the same number of cols (aka `<td>`)
-    //
-    tables.for_each(|e| {
+    tables.enumerate().for_each(|(n, e)| {
         // For each line
         //
         debug!("frag={:?}", e.html());
 
+        info!("Table");
+
         // Now we want each <tr>
         //
         let sel = Selector::parse("tr").unwrap();
-        let iter = e.select(&sel).into_iter();
+        let iter = e.select(&sel);
 
-        let res: Vec<_> = iter
-            .inspect(|e| debug!("td={e:?}"))
-            .map(|e| {
-                let frag = e.html().to_owned();
+        let mut area = Area::new(hdrs.get(n).unwrap());
 
-                // Filter
-                //
-                let frag = re.replace_all(&frag, "");
+        iter.for_each(|e| {
+            debug!("td={e:?}");
+            let frag = e.html();
 
-                // Get what we want
-                //
-                let (_, (a, b)) = parse_tr(&frag).unwrap();
-                format!("num={} tag={}", a, b)
-            })
-            .collect();
+            // Filter
+            //
+            let frag = re.replace_all(&frag, "");
 
-        println!("res={:?}\n", res);
+            // Get what we want
+            //
+            let (_, (a, b)) = parse_tr(&frag).unwrap();
+            area.add(a, b);
+        });
+
+        println!("area={}\n", area);
     });
     info!("Information retrieved on: {}", today);
     Ok(())
