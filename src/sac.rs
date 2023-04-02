@@ -1,4 +1,6 @@
+use log::trace;
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 
 use crate::sac::SAC::{Hex, Range};
 
@@ -29,6 +31,22 @@ impl SAC {
 impl Default for SAC {
     fn default() -> Self {
         SAC::new()
+    }
+}
+
+impl Display for SAC {
+    /// Set the default formatter
+    ///
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                SAC::Empty => "",
+                SAC::Hex(s) => s,
+                SAC::Range(s) => s,
+            }
+        )
     }
 }
 
@@ -76,12 +94,21 @@ impl Area {
 
     /// Add a code
     ///
-    pub fn add<T: Into<SAC>>(&mut self, code: T, label: &str) -> &mut Self {
+    pub fn add<T>(&mut self, code: T, label: &str) -> &mut Self
+    where
+        T: Into<SAC> + Display,
+    {
+        trace!("add({}, {})", code, label.to_owned());
         self.list.insert(code.into(), label.to_owned());
         self
     }
 }
 
+impl Display for Area {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}\n{:?}", self.label, self.list)
+    }
+}
 // ----------------------------------
 
 #[cfg(test)]
