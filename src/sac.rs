@@ -8,7 +8,9 @@ use serde::{Deserialize, Serialize};
 ///
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub enum SAC {
+    /// Simple hex value
     Hex(String),
+    /// Range of code, maybe use a real range type?
     Range(String),
 }
 
@@ -70,5 +72,19 @@ impl Area {
     pub fn add(&mut self, code: Code, label: &str) -> &mut Self {
         self.list.insert(code.to_owned(), label.to_owned());
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("A4", SAC::Hex("A4".to_owned()))]
+    #[case("00", SAC::Hex("00".to_owned()))]
+    #[case("A0...C3", SAC::Range("A0...C3".to_owned()) )]
+    fn test_sac_new(#[case] num: &str, #[case] sac: SAC) {
+        assert_eq!(sac, SAC::new(num))
     }
 }
