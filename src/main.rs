@@ -97,7 +97,8 @@ fn main() -> Result<()> {
 
         let mut area = Area::new(hdrs.get(n).unwrap());
 
-        iter.inspect(|e| debug!("td={e:?}")).for_each(|e| {
+        iter.for_each(|e| {
+            debug!("td={e:?}");
             let frag = e.html();
 
             // Filter
