@@ -43,9 +43,7 @@ fn parse_three(input: &str) -> IResult<&str, (&str, &str)> {
 }
 
 fn parse_span(input: &str) -> IResult<&str, &str> {
-    delimited(tag_no_case("<span>"),
-              parse_content,
-              tag_no_case("</span>"))(input)
+    delimited(tag_no_case("<span>"), parse_content, tag_no_case("</span>"))(input)
 }
 
 pub fn parse_tr(input: &str) -> IResult<&str, (&str, &str)> {
@@ -79,7 +77,10 @@ mod tests {
     #[rstest]
     #[case("<td>foo</td>", "foo")]
     #[case("<td><strong>foo</strong></td>", "foo")]
-    #[case("<td><strong>Binary Representation</strong></td>", "Binary Representation")]
+    #[case(
+        "<td><strong>Binary Representation</strong></td>",
+        "Binary Representation"
+    )]
     fn test_parse_td(#[case] input: &str, #[case] res: &str) {
         let (_, r) = parse_td(input).unwrap();
         assert_eq!(res, r)
