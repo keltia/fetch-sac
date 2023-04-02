@@ -73,7 +73,7 @@ fn main() -> Result<()> {
 
     // Get all <table>
     //
-    let tables = doc.select(&sel).into_iter();
+    let tables = doc.select(&sel);
 
     // Define a regex to sanitize some data, don't ask me why some entries have an embedded
     // <br> or <br />.  Makes no sense to me.
@@ -92,12 +92,12 @@ fn main() -> Result<()> {
         // Now we want each <tr>
         //
         let sel = Selector::parse("tr").unwrap();
-        let iter = e.select(&sel).into_iter();
+        let iter = e.select(&sel);
 
         let res: Vec<_> = iter
             .inspect(|e| debug!("td={e:?}"))
             .map(|e| {
-                let frag = e.html().to_owned();
+                let frag = e.html();
 
                 // Filter
                 //

@@ -58,7 +58,7 @@ pub fn parse_tr(input: &str) -> IResult<&str, (&str, &str)> {
 
 pub fn parse_header(input: &Html) -> Result<Vec<String>> {
     let sel = Selector::parse("a > span, [class=field--type-advanced-title]").unwrap();
-    let doc = input.select(&sel).into_iter();
+    let doc = input.select(&sel);
     let r = doc
         .filter(|e| !e.html().contains("class"))
         .map(|e| {
