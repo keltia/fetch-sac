@@ -106,7 +106,7 @@ I use Git Flow for this package so please use something similar or the usual Git
 
 [RUST]: https://www.rust-lang.org/
 
-[fetchsac: 1.56+]: https://img.shields.io/badge/Rust%20version-1.56%2B-lightgrey
+[fetch-sac: 1.56+]: https://img.shields.io/badge/Rust%20version-1.56%2B-lightgrey
 
 [Rust 1.56]: https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html
 
