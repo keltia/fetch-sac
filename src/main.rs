@@ -3,9 +3,10 @@
 //!
 //! XXX The fact that I even have to do this is an utter failure on the Agency side.
 
-mod cli;
-mod parse;
-mod version;
+pub mod cli;
+pub mod parse;
+pub mod sac;
+pub mod version;
 
 use anyhow::Result;
 use chrono::{DateTime, Utc};
