@@ -1,7 +1,6 @@
 use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
-use serde_json::to_string;
 
 // ----------------------------------
 
@@ -79,6 +78,12 @@ mod tests {
     #[test]
     fn test_sac_new() {
         let sac = SAC::new();
+        assert_eq!(SAC::Empty, sac);
+    }
+
+    #[test]
+    fn test_sac_default() {
+        let sac = SAC::default();
         assert_eq!(SAC::Empty, sac);
     }
 
