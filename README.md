@@ -19,8 +19,8 @@ Licensed under the [MIT](LICENSE) license.
 2. [History](#history)
 2. [Installation](#installation)
 3. [Usage](#usage)
-4. [Supported formats](#formats)
-5. [MSRV](#msrv)
+4. [MSRV](#msrv)
+5. [Supported platforms](#supported-platforms)
 6. [TODO](#todo)
 7. [Contributing](#contributing)
 
