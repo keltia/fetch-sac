@@ -1,3 +1,9 @@
+//! Module which implement a model to represent SAC codes anbd their variations.
+//!
+//! The `Area` struct is using `String`  as its key to avoid painful JSON issues which would
+//! force me to implement a custom serializer/deserializer for the `SAC` enum.
+//!
+
 use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
