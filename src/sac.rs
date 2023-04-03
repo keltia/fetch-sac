@@ -1,8 +1,7 @@
 use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
-
-use crate::sac::SAC::{Hex, Range};
+use serde_json::to_string;
 
 // ----------------------------------
 
@@ -12,8 +11,8 @@ use crate::sac::SAC::{Hex, Range};
 pub enum SAC {
     /// Simple hex value
     Hex(String),
-    /// Range of code, maybe use a real range type?
-    Range(String),
+    /// Range of codes
+    Range { lo: usize, hi: usize },
     /// Guess
     Empty,
 }
@@ -40,9 +39,9 @@ impl Display for SAC {
             f,
             "{}",
             match self {
-                SAC::Empty => "",
-                Hex(s) => s,
-                Range(s) => s,
+                SAC::Empty => "".to_owned(),
+                SAC::Hex(s) => s.to_string(),
+                SAC::Range { lo, hi } => format!("{:02X}...{:02X}", lo, hi),
             }
         )
     }
@@ -53,9 +52,12 @@ impl From<&str> for SAC {
     ///
     fn from(value: &str) -> Self {
         if value.contains("...") {
-            Range(value.to_owned())
+            let val: Vec<&str> = value.split("...").collect();
+            let lo = usize::from_str_radix(val[0], 16).unwrap();
+            let hi = usize::from_str_radix(val[1], 16).unwrap();
+            SAC::Range { lo, hi }
         } else {
-            Hex(value.to_owned())
+            SAC::Hex(value.to_owned())
         }
     }
 }
@@ -64,7 +66,7 @@ impl From<usize> for SAC {
     /// Easier to have than direct ::from()
     ///
     fn from(value: usize) -> Self {
-        Hex(format!("{:02X}", value))
+        SAC::Hex(format!("{:02X}", value))
     }
 }
 
@@ -83,7 +85,7 @@ mod tests {
     #[rstest]
     #[case("A4", SAC::Hex("A4".to_owned()))]
     #[case("00", SAC::Hex("00".to_owned()))]
-    #[case("A0...C3", SAC::Range("A0...C3".to_owned()) )]
+    #[case("A0...C3", SAC::Range {lo: 160, hi: 195})]
     fn test_sac_from_str(#[case] num: &str, #[case] sac: SAC) {
         assert_eq!(sac, SAC::from(num))
     }
