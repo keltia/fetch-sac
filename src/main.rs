@@ -107,7 +107,12 @@ fn main() -> Result<()> {
             let (_, (a, b)) = parse_tr(&frag).unwrap();
             area.add(a, b);
         });
-        println!("area={}\n", area);
+
+        if opts.json {
+            println!("{}", serde_json::to_string(&area).unwrap());
+        } else {
+            println!("area={}\n", area);
+        }
     });
     info!("Information retrieved on: {}", today);
     Ok(())
