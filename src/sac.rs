@@ -45,8 +45,8 @@ impl Display for SAC {
             "{}",
             match self {
                 SAC::Empty => "",
-                SAC::Hex(s) => s,
-                SAC::Range(s) => s,
+                Hex(s) => s,
+                Range(s) => s,
             }
         )
     }
