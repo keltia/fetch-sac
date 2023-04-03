@@ -1,16 +1,18 @@
-use log::trace;
-use std::collections::HashMap;
+use std::collections::btree_map::{IntoValues, Iter, Keys, Values, ValuesMut};
+use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
+use std::ops::{Index, IndexMut};
+
+use log::trace;
+use serde::{Deserialize, Serialize};
 
 use crate::sac::SAC::{Hex, Range};
-
-use serde::{Deserialize, Serialize};
 
 // ----------------------------------
 
 /// Either  regular hex string or a range
 ///
-#[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, PartialOrd, Ord, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub enum SAC {
     /// Simple hex value
     Hex(String),
@@ -77,9 +79,9 @@ impl From<usize> for SAC {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Area {
     /// Name of the area
-    pub label: String,
+    label: String,
     /// List of codes
-    pub list: HashMap<SAC, String>,
+    list: BTreeMap<SAC, String>,
 }
 
 impl Area {
@@ -88,9 +90,93 @@ impl Area {
     pub fn new(s: &str) -> Self {
         Area {
             label: s.to_owned(),
-            list: HashMap::new(),
+            list: BTreeMap::new(),
         }
     }
+
+    /// Name of the area
+    ///
+    #[inline]
+    pub fn name(&self) -> String {
+        self.label.to_owned()
+    }
+
+    /// Wrap `BtreeMap::get`
+    ///
+    #[inline]
+    pub fn get<T>(&self, name: T) -> Option<&String>
+    where T: Into<SAC>,
+    {
+        self.list.get(&name.into())
+    }
+
+    /// Wrap `is_empty()`
+    ///
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.list.is_empty()
+    }
+
+    /// Wrap `len()`
+    ///
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.list.len()
+    }
+
+    /// Wrap `keys()`
+    ///
+    #[inline]
+    pub fn keys(&self) -> Keys<'_, SAC, String> {
+        self.list.keys()
+    }
+
+    /// Wrap `index_mut()`
+    ///
+    #[inline]
+    pub fn index_mut<T>(&mut self, s: T) -> Option<&String>
+    where T: Into<SAC>,
+    {
+        self.list.get(&s.into())
+    }
+
+    /// Wrap `values()`
+    ///
+    #[inline]
+    pub fn values(&self) -> Values<'_, SAC, String> {
+        self.list.values()
+    }
+
+    /// Wrap `values_mut()`
+    ///
+    #[inline]
+    pub fn values_mut(&mut self) -> ValuesMut<'_, SAC, String> {
+        self.list.values_mut()
+    }
+
+    /// Wrap `into_values()`
+    ///
+    #[inline]
+    pub fn into_values(self) -> IntoValues<SAC, String> {
+        self.list.into_values()
+    }
+
+    /// Wrap `contains_key()`
+    ///
+    #[inline]
+    pub fn contains_key<T>(&self, s: T) -> bool
+    where T: Into<SAC>,
+    {
+        self.list.contains_key(&s.into())
+    }
+
+    /// Wrap `iter()`
+    ///
+    #[inline]
+    pub fn iter(&self) -> Iter<'_, SAC, String> {
+        self.list.iter()
+    }
+
 
     /// Add a code
     ///
@@ -104,17 +190,63 @@ impl Area {
     }
 }
 
+impl<'a> IntoIterator for &'a Area
+{
+    type Item = (&'a SAC, &'a String);
+    type IntoIter = Iter<'a, SAC, String>;
+
+    /// We can now do `sources.iter()`
+    ///
+    fn into_iter(self) -> Iter<'a, SAC, String> {
+        self.list.iter()
+    }
+}
+
+impl Index<&SAC> for Area {
+    type Output = String;
+
+    /// Wrap `index()`
+    ///
+    #[inline]
+    fn index(&self, s: &SAC) -> &Self::Output
+    {
+        let me = self.list.get(s);
+        me.unwrap()
+    }
+}
+
+impl IndexMut<&SAC> for Area {
+    /// Wrap `index_mut()`
+    ///
+    #[inline]
+    fn index_mut(&mut self, s: &SAC) -> &mut Self::Output
+    {
+        let me = self.list.get_mut(s);
+        if me.is_none() {
+            self.list.insert(s.clone(), "".to_owned());
+        }
+        self.list.get_mut(s).unwrap()
+    }
+}
+
 impl Display for Area {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}\n{:?}", self.label, self.list)
+        let str = self.list
+            .iter()
+            .map(|(sac, label)|
+                format!("  {sac} = {label}")
+            ).collect::<Vec<String>>()
+            .join("\n");
+        write!(f, "{}\n{}", self.label, str)
     }
 }
 // ----------------------------------
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use rstest::rstest;
+
+    use super::*;
 
     #[test]
     fn test_sac_new() {
@@ -141,7 +273,7 @@ mod tests {
     fn test_area_new() {
         let a = Area::new("foo");
         assert_eq!("foo", a.label);
-        assert_eq!(HashMap::new(), a.list);
+        assert_eq!(BTreeMap::new(), a.list);
     }
 
     #[test]
