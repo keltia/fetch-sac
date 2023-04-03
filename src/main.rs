@@ -108,9 +108,10 @@ fn main() -> Result<()> {
             // Get what we want
             //
             let (_, (a, b)) = parse_tr(&frag).unwrap();
-            area.add(a, b);
+            if !a.contains("SAC") {
+                area.add(a, b);
+            }
         });
-
         println!("area={}\n", area);
     });
     info!("Information retrieved on: {}", today);
