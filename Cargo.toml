@@ -1,6 +1,6 @@
 [package]
 name = "fetch-sac"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 authors = ["Ollivier Robert <ollivier.robert@eurocontrol.int>"]
 description = "Fetch the official list of SAC codes from ASTERIX site."
@@ -30,4 +30,5 @@ reqwest = { version = "0.11", features = ["blocking"] }
 rstest = "0.17.0"
 scraper = "0"
 serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0.95", features = ["preserve_order"] }
 stderrlog = "0.5.4"

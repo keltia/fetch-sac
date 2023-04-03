@@ -12,11 +12,12 @@ use reqwest::blocking::get;
 use scraper::{Html, Selector};
 use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
+use crate::area::Area;
 use crate::cli::Opts;
 use crate::parse::{parse_header, parse_tr};
-use crate::sac::Area;
 use crate::version::version;
 
+pub mod area;
 pub mod cli;
 pub mod parse;
 pub mod sac;
@@ -72,6 +73,8 @@ fn main() -> Result<()> {
     //
     let hdrs = parse_header(&doc)?;
 
+    info!("{} regions found", hdrs.len());
+
     // Define a regex to sanitize some data, don't ask me why some entries have an embedded
     // <br> or <br />.  Makes no sense to me.
     //
@@ -79,37 +82,51 @@ fn main() -> Result<()> {
 
     // Now look into every table header and table in parallel
     //
-    hdrs.iter().zip(doc.select(&sel)).for_each(|(n, e)| {
-        // For each line
-        //
-        debug!("frag={:?}", e.html());
-
-        info!("Table");
-
-        // Now we want each <tr>
-        //
-        let sel = Selector::parse("tr").unwrap();
-        let iter = e.select(&sel);
-
-        let mut area = Area::new(n);
-
-        iter.for_each(|e| {
-            debug!("td={e:?}");
-            let frag = e.html();
-
-            // Filter
+    let areas: Vec<Area> = hdrs
+        .iter()
+        .zip(doc.select(&sel))
+        .map(|(name, e)| {
+            // For each line
             //
-            let frag = re.replace_all(&frag, "");
+            info!("Table({})", name);
 
-            // Get what we want
+            debug!("frag={}", e.html());
+
+            // Now we want each <tr>
             //
-            let (_, (a, b)) = parse_tr(&frag).unwrap();
-            if !a.contains("SAC") {
+            let sel = Selector::parse("tr").unwrap();
+            let iter = e.select(&sel);
+
+            let mut area = Area::new(name);
+
+            iter.filter(|e| !e.html().contains("SAC")).for_each(|e| {
+                debug!("td={e:?}");
+                let frag = e.html();
+
+                // Filter
+                //
+                let frag = re.replace_all(&frag, "");
+
+                // Get what we want
+                //
+                let (_, (a, b)) = parse_tr(&frag).unwrap();
                 area.add(a, b);
-            }
-        });
-        println!("area={}\n", area);
-    });
+            });
+            area
+        })
+        .collect();
+    if opts.json {
+        println!("{}", serde_json::to_string(&areas).unwrap());
+    } else {
+        println!(
+            "{}\n",
+            areas
+                .iter()
+                .map(|a| format!("{a}"))
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
+    }
     info!("Information retrieved on: {}", today);
     Ok(())
 }
