@@ -1,12 +1,12 @@
 use std::collections::btree_map::{IntoValues, Iter, Keys, Values, ValuesMut};
-use log::trace;
 use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
 use std::ops::{Index, IndexMut};
 
-use crate::sac::SAC::{Hex, Range};
-
+use log::trace;
 use serde::{Deserialize, Serialize};
+
+use crate::sac::SAC::{Hex, Range};
 
 // ----------------------------------
 
@@ -244,8 +244,9 @@ impl Display for Area {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use rstest::rstest;
+
+    use super::*;
 
     #[test]
     fn test_sac_new() {
@@ -272,7 +273,7 @@ mod tests {
     fn test_area_new() {
         let a = Area::new("foo");
         assert_eq!("foo", a.label);
-        assert_eq!(BtreeMap::new(), a.list);
+        assert_eq!(BTreeMap::new(), a.list);
     }
 
     #[test]
