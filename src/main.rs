@@ -82,7 +82,7 @@ fn main() -> Result<()> {
     hdrs.iter().zip(doc.select(&sel)).for_each(|(name, e)| {
         // For each line
         //
-        info!("Table {name}");
+        info!("Table");
 
         debug!("frag={}", e.html());
 
