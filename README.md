@@ -50,6 +50,7 @@ remove all the HTML and outputs the result into usable formats.
 
 ```text
 Fetch the latest SAC codes data from ECTL.
+Source: https://www.eurocontrol.int/asterix/
 
 Usage: fetch-sac [OPTIONS]
 
@@ -57,6 +58,7 @@ Options:
   -C, --csv              CSV
   -J, --json             JSON
   -o, --output <OUTPUT>  Output file
+  -q, --quiet            Quiet mode
   -v, --verbose...       Verbose mode
   -V, --version          Display utility full version
   -h, --help             Print help
@@ -83,6 +85,14 @@ The Minimum Supported Rust Version is *1.56* due to the 2021 Edition.
   * cmd.exe
   * Powershell
 
+## TODO
+
+- ~~fetch and parse the page~~
+- ~~text output~~
+- ~~json output~~
+- csv output
+- tests & documentation
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](CONTRIBUTING.md) for some simple rules.
@@ -97,6 +107,10 @@ I use Git Flow for this package so please use something similar or the usual Git
 6. Create a new Pull Request
 
 [Asterix]: https://www.eurocontrol.int/asterix/
+
+[JSON]: https://en.wikipedia.org/wiki/JSON
+
+[CSV]: https://en.wikipedia.org/wiki/CSV
 
 [Crates.io]: https://crates.io/
 
