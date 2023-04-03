@@ -6,8 +6,6 @@ use std::ops::{Index, IndexMut};
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-use crate::sac::SAC;
-
 /// One `Area` (group of countries, continent, etc.)
 ///
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -15,7 +13,7 @@ pub struct Area {
     /// Name of the area
     label: String,
     /// List of codes
-    list: BTreeMap<SAC, String>,
+    list: BTreeMap<String, String>,
 }
 
 impl Area {
@@ -38,11 +36,8 @@ impl Area {
     /// Wrap `BtreeMap::get`
     ///
     #[inline]
-    pub fn get<T>(&self, name: T) -> Option<&String>
-    where
-        T: Into<SAC>,
-    {
-        self.list.get(&name.into())
+    pub fn get(&self, name: &str) -> Option<&String> {
+        self.list.get(name)
     }
 
     /// Wrap `is_empty()`
@@ -62,64 +57,55 @@ impl Area {
     /// Wrap `keys()`
     ///
     #[inline]
-    pub fn keys(&self) -> Keys<'_, SAC, String> {
+    pub fn keys(&self) -> Keys<'_, String, String> {
         self.list.keys()
     }
 
     /// Wrap `index_mut()`
     ///
     #[inline]
-    pub fn index_mut<T>(&mut self, s: T) -> Option<&String>
-    where
-        T: Into<SAC>,
-    {
-        self.list.get(&s.into())
+    pub fn index_mut(&mut self, s: &str) -> Option<&String> {
+        self.list.get(s)
     }
 
     /// Wrap `values()`
     ///
     #[inline]
-    pub fn values(&self) -> Values<'_, SAC, String> {
+    pub fn values(&self) -> Values<'_, String, String> {
         self.list.values()
     }
 
     /// Wrap `values_mut()`
     ///
     #[inline]
-    pub fn values_mut(&mut self) -> ValuesMut<'_, SAC, String> {
+    pub fn values_mut(&mut self) -> ValuesMut<'_, String, String> {
         self.list.values_mut()
     }
 
     /// Wrap `into_values()`
     ///
     #[inline]
-    pub fn into_values(self) -> IntoValues<SAC, String> {
+    pub fn into_values(self) -> IntoValues<String, String> {
         self.list.into_values()
     }
 
     /// Wrap `contains_key()`
     ///
     #[inline]
-    pub fn contains_key<T>(&self, s: T) -> bool
-    where
-        T: Into<SAC>,
-    {
-        self.list.contains_key(&s.into())
+    pub fn contains_key(&self, s: &str) -> bool {
+        self.list.contains_key(s)
     }
 
     /// Wrap `iter()`
     ///
     #[inline]
-    pub fn iter(&self) -> Iter<'_, SAC, String> {
+    pub fn iter(&self) -> Iter<'_, String, String> {
         self.list.iter()
     }
 
     /// Add a code
     ///
-    pub fn add<T>(&mut self, code: T, label: &str) -> &mut Self
-    where
-        T: Into<SAC> + Display,
-    {
+    pub fn add(&mut self, code: &str, label: &str) -> &mut Self {
         trace!("add({}, {})", code, label.to_owned());
         self.list.insert(code.into(), label.to_owned());
         self
@@ -127,36 +113,36 @@ impl Area {
 }
 
 impl<'a> IntoIterator for &'a Area {
-    type Item = (&'a SAC, &'a String);
-    type IntoIter = Iter<'a, SAC, String>;
+    type Item = (&'a String, &'a String);
+    type IntoIter = Iter<'a, String, String>;
 
     /// We can now do `sources.iter()`
     ///
-    fn into_iter(self) -> Iter<'a, SAC, String> {
+    fn into_iter(self) -> Iter<'a, String, String> {
         self.list.iter()
     }
 }
 
-impl Index<&SAC> for Area {
+impl Index<&str> for Area {
     type Output = String;
 
     /// Wrap `index()`
     ///
     #[inline]
-    fn index(&self, s: &SAC) -> &Self::Output {
+    fn index(&self, s: &str) -> &Self::Output {
         let me = self.list.get(s);
         me.unwrap()
     }
 }
 
-impl IndexMut<&SAC> for Area {
+impl IndexMut<&str> for Area {
     /// Wrap `index_mut()`
     ///
     #[inline]
-    fn index_mut(&mut self, s: &SAC) -> &mut Self::Output {
+    fn index_mut(&mut self, s: &str) -> &mut Self::Output {
         let me = self.list.get_mut(s);
         if me.is_none() {
-            self.list.insert(s.clone(), "".to_owned());
+            self.list.insert(s.to_owned(), "".to_owned());
         }
         self.list.get_mut(s).unwrap()
     }
@@ -192,7 +178,7 @@ mod tests {
 
         a.add("666", "Hell");
         assert_eq!("foo", a.label);
-        assert!(a.list.get(&SAC::from("666")).is_some());
-        assert_eq!("Hell", a.list.get(&SAC::from("666")).unwrap());
+        assert!(a.list.get("666").is_some());
+        assert_eq!("Hell", a.list.get("666").unwrap());
     }
 }
