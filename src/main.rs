@@ -12,11 +12,12 @@ use reqwest::blocking::get;
 use scraper::{Html, Selector};
 use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
+use crate::area::Area;
 use crate::cli::Opts;
 use crate::parse::{parse_header, parse_tr};
-use crate::sac::Area;
 use crate::version::version;
 
+pub mod area;
 pub mod cli;
 pub mod parse;
 pub mod sac;
@@ -93,20 +94,18 @@ fn main() -> Result<()> {
 
         let mut area = Area::new(name);
 
-        iter
-            .filter(|e| !e.html().contains("SAC"))
-            .for_each(|e| {
-                debug!("td={e:?}");
-                let frag = e.html();
+        iter.filter(|e| !e.html().contains("SAC")).for_each(|e| {
+            debug!("td={e:?}");
+            let frag = e.html();
 
-                // Filter
-                //
-                let frag = re.replace_all(&frag, "");
+            // Filter
+            //
+            let frag = re.replace_all(&frag, "");
 
-                // Get what we want
-                //
-                let (_, (a, b)) = parse_tr(&frag).unwrap();
-                area.add(a, b);
+            // Get what we want
+            //
+            let (_, (a, b)) = parse_tr(&frag).unwrap();
+            area.add(a, b);
         });
         println!("area={}\n", area);
     });
