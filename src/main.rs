@@ -3,6 +3,9 @@
 //!
 //! XXX The fact that I even have to do this is an utter failure on the Agency side.
 
+use std::fs;
+use std::time::Instant;
+
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use clap::Parser;
@@ -58,8 +61,12 @@ fn main() -> Result<()> {
 
     // Fetch the official page
     //
+    let now = Instant::now();
     let doc = get(PAGE)?.text()?;
+    let now = now.elapsed().as_millis();
     let today: DateTime<Utc> = Utc::now();
+
+    info!("Fetch took {} ms", now);
 
     // We want <table> because sometimes there are 3 <td> and sometimes 2 inside a <tr>.
     //
@@ -79,6 +86,9 @@ fn main() -> Result<()> {
     // <br> or <br />.  Makes no sense to me.
     //
     let re = Regex::new(r##"<br>"##).unwrap();
+
+    // Time it
+    let now = Instant::now();
 
     // Now look into every table header and table in parallel
     //
@@ -115,18 +125,36 @@ fn main() -> Result<()> {
             area
         })
         .collect();
-    if opts.json {
-        println!("{}", serde_json::to_string(&areas).unwrap());
+
+    let now = now.elapsed().as_millis();
+
+    info!("Processing took {} ms", now);
+
+    // get everything into `data`
+    //
+    let data: String = if opts.json {
+        format!("{}", serde_json::to_string(&areas).unwrap())
     } else {
-        println!(
+        format!(
             "{}\n",
             areas
                 .iter()
                 .map(|a| format!("{a}"))
                 .collect::<Vec<_>>()
                 .join("\n")
-        );
+        )
+    };
+
+    // Write output
+    //
+    match opts.output {
+        Some(output) => {
+            info!("Writing {}...", output.to_string_lossy());
+            fs::write(output, data)?
+        }
+        _ => println!("{}", data),
     }
+
     info!("Information retrieved on: {}", today);
     Ok(())
 }
