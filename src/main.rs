@@ -72,18 +72,14 @@ fn main() -> Result<()> {
     //
     let hdrs = parse_header(&doc)?;
 
-    // Get all <table>
-    //
-    let tables = doc.select(&sel);
-
     // Define a regex to sanitize some data, don't ask me why some entries have an embedded
     // <br> or <br />.  Makes no sense to me.
     //
     let re = Regex::new(r##"<br>"##).unwrap();
 
-    // Now look into every table.
+    // Now look into every table header and table in parallel
     //
-    tables.enumerate().for_each(|(n, e)| {
+    hdrs.iter().zip(doc.select(&sel)).for_each(|(n, e)| {
         // For each line
         //
         debug!("frag={:?}", e.html());
@@ -95,7 +91,7 @@ fn main() -> Result<()> {
         let sel = Selector::parse("tr").unwrap();
         let iter = e.select(&sel);
 
-        let mut area = Area::new(hdrs.get(n).unwrap());
+        let mut area = Area::new(n);
 
         iter.for_each(|e| {
             debug!("td={e:?}");
