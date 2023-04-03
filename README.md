@@ -90,6 +90,7 @@ The Minimum Supported Rust Version is *1.56* due to the 2021 Edition.
 - ~~fetch and parse the page~~
 - ~~text output~~
 - ~~json output~~
+- ~~handle different output~~
 - csv output
 - tests & documentation
 

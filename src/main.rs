@@ -3,6 +3,7 @@
 //!
 //! XXX The fact that I even have to do this is an utter failure on the Agency side.
 
+use std::fs;
 use std::time::Instant;
 
 use anyhow::Result;
@@ -127,18 +128,33 @@ fn main() -> Result<()> {
 
     let now = now.elapsed().as_millis();
 
-    if opts.json {
-        println!("{}", serde_json::to_string(&areas).unwrap());
+    info!("Processing took {} ms", now);
+
+    // get everything into `data`
+    //
+    let data: String = if opts.json {
+        format!("{}", serde_json::to_string(&areas).unwrap())
     } else {
-        println!(
+        format!(
             "{}\n",
             areas
                 .iter()
                 .map(|a| format!("{a}"))
                 .collect::<Vec<_>>()
                 .join("\n")
-        );
+        )
+    };
+
+    // Write output
+    //
+    match opts.output {
+        Some(output) => {
+            info!("Writing {}...", output.to_string_lossy());
+            fs::write(output, data)?
+        }
+        _ => println!("{}", data),
     }
-    info!("Information retrieved on: {}, took {} ms", today, now);
+
+    info!("Information retrieved on: {}", today);
     Ok(())
 }
