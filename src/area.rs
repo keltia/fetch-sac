@@ -177,8 +177,6 @@ impl Display for Area {
 
 #[cfg(test)]
 mod tests {
-    use rstest::rstest;
-
     use super::*;
 
     #[test]
