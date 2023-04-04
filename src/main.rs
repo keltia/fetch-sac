@@ -133,16 +133,13 @@ fn main() -> Result<()> {
     // get everything into `data`
     //
     let data: String = if opts.json {
-        format!("{}", serde_json::to_string(&areas).unwrap())
+        serde_json::to_string(&areas).unwrap()
     } else {
-        format!(
-            "{}\n",
-            areas
-                .iter()
-                .map(|a| format!("{a}"))
-                .collect::<Vec<_>>()
-                .join("\n")
-        )
+        areas
+            .iter()
+            .map(|a| format!("{a}"))
+            .collect::<Vec<_>>()
+            .join("\n")
     };
 
     // Write output
