@@ -17,11 +17,13 @@ use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
 use crate::area::Area;
 use crate::cli::Opts;
+use crate::csv::{prepare_data, to_csv};
 use crate::parse::{parse_header, parse_tr};
 use crate::version::version;
 
 pub mod area;
 pub mod cli;
+pub mod csv;
 pub mod parse;
 pub mod sac;
 pub mod version;
@@ -130,11 +132,19 @@ fn main() -> Result<()> {
 
     info!("Processing took {} ms", now);
 
-    // get everything into `data`
+    // get everything into `data` as a String, will be either json, csv or plain text
     //
     let data: String = if opts.json {
-        serde_json::to_string(&areas).unwrap()
+        // Info json directly
+        //
+        serde_json::to_string(&areas)?
+    } else if opts.csv {
+        // Flatten the different areas into one
+        //
+        to_csv(prepare_data(&areas)?)?
     } else {
+        // Just plain text,  prettier than just `dbg!()`
+        //
         areas
             .iter()
             .map(|a| format!("{a}"))
