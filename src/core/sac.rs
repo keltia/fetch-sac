@@ -10,6 +10,8 @@ use serde::{Deserialize, Serialize};
 
 // ----------------------------------
 
+#[allow(clippy::upper_case_acronyms)]
+
 /// Either  regular hex string or a range
 ///
 #[derive(Clone, Debug, PartialOrd, Ord, Serialize, Deserialize, Eq, PartialEq, Hash)]
