@@ -1,3 +1,6 @@
+//! Module to deal with an Area as a collection, as an iterator, etc.
+//!
+
 use std::collections::btree_map::{IntoValues, Iter, Keys, Values, ValuesMut};
 use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};

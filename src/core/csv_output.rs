@@ -1,10 +1,13 @@
+//! Module dealing data preparation for CSV output
+//!
+
 use anyhow::Result;
 use csv::{QuoteStyle, WriterBuilder};
 use log::{debug, trace};
 use serde::Serialize;
 use std::collections::VecDeque;
 
-use crate::area::Area;
+use crate::core::Area;
 
 /// Take the array with all areas and generate a vector of lines with
 /// 1. header names

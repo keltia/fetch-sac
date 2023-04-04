@@ -15,18 +15,13 @@ use reqwest::blocking::get;
 use scraper::{Html, Selector};
 use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
-use crate::area::Area;
 use crate::cli::Opts;
-use crate::csv::{prepare_data, to_csv};
-use crate::parse::{parse_header, parse_tr};
+use crate::core::{parse_header, parse_tr, prepare_data, to_csv, Area};
 use crate::version::version;
 
-pub mod area;
-pub mod cli;
-pub mod csv;
-pub mod parse;
-pub mod sac;
-pub mod version;
+mod cli;
+mod core;
+mod version;
 
 const PAGE: &str = "https://www.eurocontrol.int/asterix";
 
