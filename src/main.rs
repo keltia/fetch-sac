@@ -15,16 +15,13 @@ use reqwest::blocking::get;
 use scraper::{Html, Selector};
 use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
-use crate::area::Area;
 use crate::cli::Opts;
-use crate::parse::{parse_header, parse_tr};
+use crate::core::{parse_header, parse_tr, prepare_data, to_csv, Area};
 use crate::version::version;
 
-pub mod area;
-pub mod cli;
-pub mod parse;
-pub mod sac;
-pub mod version;
+mod cli;
+mod core;
+mod version;
 
 const PAGE: &str = "https://www.eurocontrol.int/asterix";
 
@@ -130,19 +127,24 @@ fn main() -> Result<()> {
 
     info!("Processing took {} ms", now);
 
-    // get everything into `data`
+    // get everything into `data` as a String, will be either json, csv or plain text
     //
     let data: String = if opts.json {
-        format!("{}", serde_json::to_string(&areas).unwrap())
+        // Info json directly
+        //
+        serde_json::to_string(&areas)?
+    } else if opts.csv {
+        // Flatten the different areas into one
+        //
+        to_csv(prepare_data(&areas)?)?
     } else {
-        format!(
-            "{}\n",
-            areas
-                .iter()
-                .map(|a| format!("{a}"))
-                .collect::<Vec<_>>()
-                .join("\n")
-        )
+        // Just plain text,  prettier than just `dbg!()`
+        //
+        areas
+            .iter()
+            .map(|a| format!("{a}"))
+            .collect::<Vec<_>>()
+            .join("\n")
     };
 
     // Write output
