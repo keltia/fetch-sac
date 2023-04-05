@@ -39,9 +39,32 @@ is for me clearly unacceptable in 2023 and getting the list in various formats l
 
 ## Installation
 
-It will be available at some point as crates on [Crates.io]  but for the moment just as a repository on
-[GitHub]. Installation can be done either through a compiled binary for your platform or by cloning the repo and
-compiling.
+It is be available as a crate on [Crates.io] and as a repository on [GitHub]. Installation can be done either through
+a compiled binary for your platform or by cloning the repo and compiling.
+
+### cargo
+
+UNIX/macOS:
+
+```text
+$ cargo install fetch-sac
+```
+
+Windows
+
+```text
+C:\> cargo.exe install fetch-sac
+```
+
+### From source
+
+```text
+$ git clone https://github.com/keltia/fetch-sac
+$ cd fetch-sac
+$ cargo build
+$ cargo test
+$ cargo install --release
+```
 
 ## Usage
 
