@@ -24,7 +24,7 @@ pub fn scrape_data(doc: String) -> Result<Vec<Area>> {
     // Define a regex to sanitize some data, don't ask me why some entries have an embedded
     // <br> or <br />.  Makes no sense to me.
     //
-    let re = Regex::new(r##"<br>"##)?;
+    let re = Regex::new(r##"<br>"##).unwrap();
 
     // Parse the page
     //
@@ -38,7 +38,7 @@ pub fn scrape_data(doc: String) -> Result<Vec<Area>> {
 
     // We want <table> because sometimes there are 3 <td> and sometimes 2 inside a <tr>.
     //
-    let sel = Selector::parse("table")?;
+    let sel = Selector::parse("table").unwrap();
 
     // Now look into every table header and table in parallel
     //
