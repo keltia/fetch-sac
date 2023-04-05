@@ -1,7 +1,7 @@
 //! Small CLI utility to fetch the official ASTERIX webpage and scrape the Hell of it in order
 //! to get the official list of SAC codes.
 //!
-//! XXX The fact that I even have to do this is an utter failure on the Agency side.
+//! XXX The fact that I even have to do this is mind-boggling.
 
 use std::fs;
 use std::time::Instant;

@@ -1,5 +1,7 @@
 //! Core module dealing with the data we operate on
 //!
+//! The main scraper is defined here, calling parts of the module like the parser to prepare data, etc.
+//!
 
 use anyhow::Result;
 use log::{debug, info};
