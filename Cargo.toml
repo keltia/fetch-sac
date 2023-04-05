@@ -34,4 +34,5 @@ serde_json = { version = "1.0.95", features = ["preserve_order"] }
 stderrlog = "0.5.4"
 
 [dev-dependencies]
+assert_cmd = { version = "2.0.10", features = ["color-auto"] }
 rstest = "0.17.0"
