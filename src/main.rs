@@ -7,7 +7,7 @@ use std::fs;
 use std::time::Instant;
 
 use anyhow::Result;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use clap::Parser;
 use log::{debug, info};
 use reqwest::blocking::get;
@@ -59,11 +59,11 @@ fn main() -> Result<()> {
     let now = Instant::now();
     let doc = get(PAGE)?.text()?;
     let now = now.elapsed().as_millis();
-    let today: DateTime<Utc> = Utc::now();
 
     info!("Fetch took {} ms", now);
 
     // Time it
+    //
     let now = Instant::now();
     let areas = scrape_data(doc)?;
     let now = now.elapsed().as_millis();
@@ -100,6 +100,6 @@ fn main() -> Result<()> {
         _ => println!("{}", data),
     }
 
-    info!("Information retrieved on: {}", today);
+    info!("Information retrieved on: {}", Utc::now());
     Ok(())
 }
