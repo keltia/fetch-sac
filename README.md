@@ -125,4 +125,4 @@ I use Git Flow for this package so please use something similar or the usual Git
 
 [Rust 1.56]: https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html
 
-[ECTL]: https://www/eurocontrol.int/
+[ECTL]: https://www.eurocontrol.int/
