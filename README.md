@@ -6,8 +6,8 @@
 
 [![Build status](https://github.com/keltia/fetch-sac/actions/workflows/rust.yml/badge.svg)](https://github.com/keltia/fetch-sac/actions/workflows/rust.yml)
 [![Buildstatus (develop)](https://github.com/keltia/fetch-sac/actions/workflows/develop.yml/badge.svg)](https://github.com/keltia/fetch-sac/actions/workflows/develop.yml)
-[![Docs](https://img.shields.io/docsrs/dmarc-rs)](https://docs.rs/drone-utils)
-[![GitHub release](https://img.shields.io/github/release/keltia/dmarc-rs.svg)](https://github.com/keltia/fetch-sac/releases/)
+[![Docs](https://img.shields.io/docsrs/fetch-sac)](https://docs.rs/fetch-sac)
+[![GitHub release](https://img.shields.io/github/release/keltia/fetch-sac.svg)](https://github.com/keltia/fetch-sac/releases/)
 [![GitHub issues](https://img.shields.io/github/issues/keltia/fetch-sac.svg)](https://github.com/keltia/fetch-sac/issues)
 [![fetch-sac: 1.56+]][Rust 1.56]
 [![SemVer](https://img.shields.io/badge/semver-2.0.0-blue)](https://semver.org/spec/v2.0.0.html)
@@ -39,9 +39,32 @@ is for me clearly unacceptable in 2023 and getting the list in various formats l
 
 ## Installation
 
-It will be available at some point as crates on [Crates.io]  but for the moment just as a repository on
-[GitHub]. Installation can be done either through a compiled binary for your platform or by cloning the repo and
-compiling.
+It is be available as a crate on [Crates.io] and as a repository on [GitHub]. Installation can be done either through
+a compiled binary for your platform or by cloning the repo and compiling.
+
+### cargo
+
+UNIX/macOS:
+
+```text
+$ cargo install fetch-sac
+```
+
+Windows
+
+```text
+C:\> cargo.exe install fetch-sac
+```
+
+### From source
+
+```text
+$ git clone https://github.com/keltia/fetch-sac
+$ cd fetch-sac
+$ cargo build
+$ cargo test
+$ cargo install --release
+```
 
 ## Usage
 
@@ -68,11 +91,10 @@ Options:
 
 As this utility is scraping the web page directly, looking for what interests it, it may of course break from time
 to time as the page get updated (not very often though). The format of the various tabs in the table is different
-between
-all of them which makes it more complicated. There is also the matter of the `<br>`  inserted at some points breaking
-the parsing, it tries to compensate for this.
+between all of them which makes it more complicated. There is also the matter of the `<br>`  inserted at some points
+breaking the parsing, it tries to compensate for this.
 
-This way of doing things is so '90 and broken, you don't want to hear my full comment.
+This way of doing things is so '90 and broken.
 
 ## MSRV
 
@@ -91,7 +113,8 @@ The Minimum Supported Rust Version is *1.56* due to the 2021 Edition.
 - ~~text output~~
 - ~~json output~~
 - ~~handle different output~~
-- csv output
+- ~~csv output~~
+- ~~adding CLI tests~~
 - tests & documentation
 
 ## Contributing
@@ -125,4 +148,4 @@ I use Git Flow for this package so please use something similar or the usual Git
 
 [Rust 1.56]: https://blog.rust-lang.org/2021/10/21/Rust-1.56.0.html
 
-[ECTL]: https://www/eurocontrol.int/
+[ECTL]: https://www.eurocontrol.int/

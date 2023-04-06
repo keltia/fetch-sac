@@ -1,22 +1,20 @@
 //! Small CLI utility to fetch the official ASTERIX webpage and scrape the Hell of it in order
 //! to get the official list of SAC codes.
 //!
-//! XXX The fact that I even have to do this is an utter failure on the Agency side.
+//! XXX The fact that I even have to do this is mind-boggling.
 
 use std::fs;
 use std::time::Instant;
 
 use anyhow::Result;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use clap::Parser;
 use log::{debug, info};
-use regex::Regex;
 use reqwest::blocking::get;
-use scraper::{Html, Selector};
 use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
 
 use crate::cli::Opts;
-use crate::core::{parse_header, parse_tr, prepare_data, to_csv, Area};
+use crate::core::{prepare_data, scrape_data, to_csv};
 use crate::version::version;
 
 mod cli;
@@ -61,68 +59,13 @@ fn main() -> Result<()> {
     let now = Instant::now();
     let doc = get(PAGE)?.text()?;
     let now = now.elapsed().as_millis();
-    let today: DateTime<Utc> = Utc::now();
 
     info!("Fetch took {} ms", now);
 
-    // We want <table> because sometimes there are 3 <td> and sometimes 2 inside a <tr>.
-    //
-    let sel = Selector::parse("table").unwrap();
-
-    // Parse the page
-    //
-    let doc = Html::parse_document(&doc);
-
-    // Load the different tabs' header
-    //
-    let hdrs = parse_header(&doc)?;
-
-    info!("{} regions found", hdrs.len());
-
-    // Define a regex to sanitize some data, don't ask me why some entries have an embedded
-    // <br> or <br />.  Makes no sense to me.
-    //
-    let re = Regex::new(r##"<br>"##).unwrap();
-
     // Time it
-    let now = Instant::now();
-
-    // Now look into every table header and table in parallel
     //
-    let areas: Vec<Area> = hdrs
-        .iter()
-        .zip(doc.select(&sel))
-        .map(|(name, e)| {
-            // For each line
-            //
-            info!("Table({})", name);
-
-            debug!("frag={}", e.html());
-
-            // Now we want each <tr>
-            //
-            let sel = Selector::parse("tr").unwrap();
-            let iter = e.select(&sel);
-
-            let mut area = Area::new(name);
-
-            iter.filter(|e| !e.html().contains("SAC")).for_each(|e| {
-                debug!("td={e:?}");
-                let frag = e.html();
-
-                // Filter
-                //
-                let frag = re.replace_all(&frag, "");
-
-                // Get what we want
-                //
-                let (_, (a, b)) = parse_tr(&frag).unwrap();
-                area.add(a, b);
-            });
-            area
-        })
-        .collect();
-
+    let now = Instant::now();
+    let areas = scrape_data(doc)?;
     let now = now.elapsed().as_millis();
 
     info!("Processing took {} ms", now);
@@ -157,6 +100,6 @@ fn main() -> Result<()> {
         _ => println!("{}", data),
     }
 
-    info!("Information retrieved on: {}", today);
+    info!("Information retrieved on: {}", Utc::now());
     Ok(())
 }
