@@ -7,8 +7,8 @@ use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+#[allow(dead_code)]
 // ----------------------------------
-
 #[allow(clippy::upper_case_acronyms)]
 
 /// Either  regular hex string or a range
