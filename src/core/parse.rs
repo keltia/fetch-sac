@@ -10,7 +10,7 @@ use nom::{
     bytes::complete::{tag_no_case, take_until},
     character::complete::multispace0,
     sequence::{delimited, terminated, tuple},
-    IResult,
+    IResult, Parser,
 };
 use scraper::{Html, Selector};
 
@@ -21,7 +21,7 @@ use scraper::{Html, Selector};
 /// * `input` - A string slice containing the content to parse
 ///
 fn parse_content(input: &str) -> IResult<&str, &str> {
-    alt((parse_strong, take_until("<")))(input)
+    alt((parse_strong, take_until("<"))).parse(input)
 }
 
 /// Parses content within table cells (td or th elements).
@@ -37,7 +37,8 @@ fn parse_td(input: &str) -> IResult<&str, &str> {
             delimited(tag_no_case("<th>"), parse_content, tag_no_case("</th>")),
         )),
         multispace0,
-    )(input)
+    )
+    .parse(input)
 }
 
 /// Parses content within strong tags.
@@ -51,7 +52,8 @@ fn parse_strong(input: &str) -> IResult<&str, &str> {
         tag_no_case("<strong>"),
         parse_content,
         tag_no_case("</strong>"),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_two(input: &str) -> IResult<&str, (&str, &str)> {
@@ -59,7 +61,7 @@ fn parse_two(input: &str) -> IResult<&str, (&str, &str)> {
 }
 
 fn parse_three(input: &str) -> IResult<&str, (&str, &str)> {
-    terminated(tuple((parse_td, parse_td)), parse_td)(input)
+    terminated(tuple((parse_td, parse_td)), parse_td).parse(input)
 }
 
 /// Parses content within span tags.
@@ -69,7 +71,7 @@ fn parse_three(input: &str) -> IResult<&str, (&str, &str)> {
 /// * `input` - A string slice containing the span element to parse
 ///
 fn parse_span(input: &str) -> IResult<&str, &str> {
-    delimited(tag_no_case("<span>"), parse_content, tag_no_case("</span>"))(input)
+    delimited(tag_no_case("<span>"), parse_content, tag_no_case("</span>")).parse(input)
 }
 
 /// Parses a complete HTML table row (`<tr>`) containing SAC information.
@@ -86,7 +88,8 @@ pub fn parse_tr(input: &str) -> IResult<&str, (&str, &str)> {
         terminated(tag_no_case("<tr>"), multispace0),
         alt((parse_three, parse_two)),
         terminated(tag_no_case("</tr>"), multispace0),
-    )(input)
+    )
+    .parse(input)
 }
 
 /// Extracts header information from an HTML document.

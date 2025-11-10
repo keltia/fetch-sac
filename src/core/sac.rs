@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// Represents a System Area Code (SAC) which can be either a single hex value,
 /// a range of values, or empty.
-/// 
+///
 #[derive(Clone, Debug, PartialOrd, Ord, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub enum SAC {
     /// Single hexadecimal value stored as a string
@@ -66,7 +66,7 @@ impl From<&str> for SAC {
     ///
     /// # Returns
     /// Returns either a `SAC::Hex` or `SAC::Range` variant depending on the input format.
-    /// 
+    ///
     fn from(value: &str) -> Self {
         if value.contains("...") {
             let val: Vec<&str> = value.split("...").collect();
@@ -87,7 +87,7 @@ impl From<usize> for SAC {
     ///
     /// # Returns
     /// Returns a `SAC::Hex` variant with the value formatted as a two-digit hex string.
-    /// 
+    ///
     fn from(value: usize) -> Self {
         SAC::Hex(format!("{:02X}", value))
     }

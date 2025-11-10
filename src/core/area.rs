@@ -15,7 +15,7 @@
 //! assert_eq!(area.name(), "Europe");
 //! assert_eq!(area.len(), 2);
 //! ```
-//! 
+//!
 
 use std::collections::btree_map::{IntoValues, Iter, Keys, Values, ValuesMut};
 use std::collections::BTreeMap;
@@ -38,7 +38,7 @@ use serde::{Deserialize, Serialize};
 /// europe.add("FR", "France");
 /// assert_eq!(europe.name(), "Europe");
 /// ```
-/// 
+///
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Area {
     /// The display name or identifier for this area
