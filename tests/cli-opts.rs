@@ -1,10 +1,8 @@
 use std::fs;
 
-use assert_cmd::cargo::cargo_bin;
+use assert_cmd::cargo_bin;
 use assert_cmd::prelude::*;
 use std::process::Command;
-
-const BIN: &str = "fetch-sac";
 
 #[test]
 fn test_empty_args() {
