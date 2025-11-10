@@ -1,4 +1,6 @@
-//! nom-based parser for the data we want to extract.
+//! This module provides parsing functionality to extract structured data from HTML tables
+//! containing SAC (System Area Code) information. It uses nom for parsing HTML elements
+//! and scraper for higher-level HTML document traversal.
 //!
 
 use anyhow::Result;
@@ -12,10 +14,22 @@ use nom::{
 };
 use scraper::{Html, Selector};
 
+/// Parses content within HTML elements, handling both strong tags and plain text.
+///
+/// # Arguments
+///
+/// * `input` - A string slice containing the content to parse
+///
 fn parse_content(input: &str) -> IResult<&str, &str> {
     alt((parse_strong, take_until("<")))(input)
 }
 
+/// Parses content within table cells (td or th elements).
+///
+/// # Arguments
+///
+/// * `input` - A string slice containing the table cell to parse
+///
 fn parse_td(input: &str) -> IResult<&str, &str> {
     terminated(
         alt((
@@ -26,6 +40,12 @@ fn parse_td(input: &str) -> IResult<&str, &str> {
     )(input)
 }
 
+/// Parses content within strong tags.
+///
+/// # Arguments
+///
+/// * `input` - A string slice containing the strong element to parse
+///
 fn parse_strong(input: &str) -> IResult<&str, &str> {
     delimited(
         tag_no_case("<strong>"),
@@ -42,10 +62,25 @@ fn parse_three(input: &str) -> IResult<&str, (&str, &str)> {
     terminated(tuple((parse_td, parse_td)), parse_td)(input)
 }
 
+/// Parses content within span tags.
+///
+/// # Arguments
+///
+/// * `input` - A string slice containing the span element to parse
+///
 fn parse_span(input: &str) -> IResult<&str, &str> {
     delimited(tag_no_case("<span>"), parse_content, tag_no_case("</span>"))(input)
 }
 
+/// Parses a complete HTML table row (`<tr>`) containing SAC information.
+///
+/// Takes a string containing an HTML table row and returns a tuple of two strings:
+/// the SAC code and the corresponding country/area name.
+///
+/// # Arguments
+///
+/// * `input` - A string slice containing the HTML table row to parse
+///
 pub fn parse_tr(input: &str) -> IResult<&str, (&str, &str)> {
     delimited(
         terminated(tag_no_case("<tr>"), multispace0),
@@ -54,6 +89,19 @@ pub fn parse_tr(input: &str) -> IResult<&str, (&str, &str)> {
     )(input)
 }
 
+/// Extracts header information from an HTML document.
+///
+/// Parses the document to find span elements and advanced-title fields,
+/// returning their text content as a vector of strings.
+///
+/// # Arguments
+///
+/// * `input` - Reference to an HTML document to parse
+///
+/// # Returns
+///
+/// A Result containing a vector of extracted header strings
+///
 pub fn parse_header(input: &Html) -> Result<Vec<String>> {
     let sel = Selector::parse("a > span, [class=field--type-advanced-title]").unwrap();
     let doc = input.select(&sel);
