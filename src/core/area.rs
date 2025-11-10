@@ -1,5 +1,21 @@
 //! Module to deal with an Area as a collection, as an iterator, etc.
 //!
+//! This module provides functionality to manage geographic areas (like continents or country groups)
+//! and their associated codes. It implements various collection-like behaviors through trait
+//! implementations and wrapper methods around an internal BTreeMap.
+//!
+//! # Examples
+//! ```
+//! use fetch_sac::core::Area;
+//!
+//! let mut area = Area::new("Europe");
+//! area.add("FR", "France");
+//! area.add("DE", "Germany");
+//!
+//! assert_eq!(area.name(), "Europe");
+//! assert_eq!(area.len(), 2);
+//! ```
+//! 
 
 use std::collections::btree_map::{IntoValues, Iter, Keys, Values, ValuesMut};
 use std::collections::BTreeMap;
@@ -9,18 +25,42 @@ use std::ops::{Index, IndexMut};
 use log::trace;
 use serde::{Deserialize, Serialize};
 
-/// One `Area` (group of countries, continent, etc.)
+/// Represents a geographic area or grouping (e.g., continent, region, group of countries).
 ///
+/// An `Area` contains a name (label) and maintains a collection of code-label pairs,
+/// where codes are typically country or region identifiers and labels are their corresponding names.
+///
+/// # Examples
+/// ```
+/// use fetch_sac::core::Area;
+///
+/// let mut europe = Area::new("Europe");
+/// europe.add("FR", "France");
+/// assert_eq!(europe.name(), "Europe");
+/// ```
+/// 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Area {
-    /// Name of the area
+    /// The display name or identifier for this area
     label: String,
-    /// List of codes
+    /// Map of codes to their corresponding labels/names
     list: BTreeMap<String, String>,
 }
 
 impl Area {
-    /// Create new instance
+    /// Creates a new Area instance with the specified name.
+    ///
+    /// # Arguments
+    /// * `s` - The name/label for the new area
+    ///
+    /// # Examples
+    /// ```
+    /// use fetch_sac::core::Area;
+    ///
+    /// let area = Area::new("Europe");
+    /// assert_eq!(area.name(), "Europe");
+    /// assert!(area.is_empty());
+    /// ```
     ///
     pub fn new(s: &str) -> Self {
         Area {

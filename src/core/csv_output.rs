@@ -1,5 +1,9 @@
 //! Module dealing data preparation for CSV output
 //!
+//! This module provides functionality to prepare and format data for CSV output.
+//! It handles flattening of nested data structures and ensures consistent CSV formatting
+//! with quoted strings.
+//!
 
 use anyhow::Result;
 use csv::{QuoteStyle, WriterBuilder};
@@ -9,12 +13,23 @@ use std::collections::VecDeque;
 
 use crate::core::Area;
 
-/// Take the array with all areas and generate a vector of lines with
-/// 1. header names
-/// 2. each line with area name in the first field
+/// Prepares data for CSV output by flattening the area structure.
 ///
-/// We need to flatten the whole structure for `WriterBuilder(`) to function properly, need a
-/// single `Iterator` over the data.
+/// # Arguments
+///
+/// * `areas` - A slice of Area objects containing the data to be prepared
+///
+/// # Returns
+///
+/// * `Result<VecDeque<(String, String, String)>>` - A deque containing tuples of (Region, SAC, Label)
+///
+/// This function takes an array of areas and generates a flattened structure suitable for CSV output.
+/// It creates rows where each row contains:
+/// 1. The area name (region)
+/// 2. The SAC code
+/// 3. The corresponding label
+///
+/// The first row contains the header names: "Region", "SAC", "Label"
 ///
 pub fn prepare_data(areas: &[Area]) -> Result<VecDeque<(String, String, String)>> {
     // Generate our values for the first field
@@ -41,7 +56,20 @@ pub fn prepare_data(areas: &[Area]) -> Result<VecDeque<(String, String, String)>
     Ok(flat)
 }
 
-/// Output the final csv file, ensuring all strings are quoted for consistency
+/// Converts prepared data into CSV format with consistent string quoting.
+///
+/// # Arguments
+///
+/// * `data` - A VecDeque of serializable data to be written as CSV
+///
+/// # Returns
+///
+/// * `Result<String>` - The formatted CSV data as a string
+///
+/// This function takes the prepared data and converts it to CSV format where:
+/// - All fields are quoted (for consistency)
+/// - Fields are comma-delimited
+/// - The first row is treated as headers
 ///
 pub fn to_csv<T>(data: VecDeque<T>) -> Result<String>
 where

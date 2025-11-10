@@ -1,8 +1,7 @@
-//! Module which implement a model to represent SAC codes anbd their variations.
+//! Module which implements a model to represent SAC codes and their variations.
 //!
-//! The `Area` struct is using `String`  as its key to avoid painful JSON issues which would
+//! The `Area` struct is using `String` as its key to avoid painful JSON issues which would
 //! force me to implement a custom serializer/deserializer for the `SAC` enum.
-//!
 
 use std::fmt::{Display, Formatter};
 
@@ -14,19 +13,24 @@ use serde::{Deserialize, Serialize};
 
 /// Either  regular hex string or a range
 ///
+/// Represents a System Area Code (SAC) which can be either a single hex value,
+/// a range of values, or empty.
+/// 
 #[derive(Clone, Debug, PartialOrd, Ord, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub enum SAC {
-    /// Simple hex value
+    /// Single hexadecimal value stored as a string
     Hex(String),
-    /// Range of codes
+    /// Range of SAC codes with lower and upper bounds
     Range { lo: usize, hi: usize },
-    /// Guess
+    /// Represents an empty or undefined SAC code
     Empty,
 }
 
 impl SAC {
-    /// Create an Empty code
+    /// Creates a new empty SAC code.
     ///
+    /// # Returns
+    /// Returns a `SAC::Empty` variant.
     pub fn new() -> Self {
         SAC::Empty
     }
@@ -55,8 +59,14 @@ impl Display for SAC {
 }
 
 impl From<&str> for SAC {
-    /// Easier to have than direct ::from()
+    /// Converts a string slice into a SAC code.
     ///
+    /// # Parameters
+    /// - `value`: A string slice that can be either a hex value or a range in format "XX...YY"
+    ///
+    /// # Returns
+    /// Returns either a `SAC::Hex` or `SAC::Range` variant depending on the input format.
+    /// 
     fn from(value: &str) -> Self {
         if value.contains("...") {
             let val: Vec<&str> = value.split("...").collect();
@@ -70,8 +80,14 @@ impl From<&str> for SAC {
 }
 
 impl From<usize> for SAC {
-    /// Easier to have than direct ::from()
+    /// Converts a usize into a SAC hex code.
     ///
+    /// # Parameters
+    /// - `value`: A usize value to be converted into a hex representation
+    ///
+    /// # Returns
+    /// Returns a `SAC::Hex` variant with the value formatted as a two-digit hex string.
+    /// 
     fn from(value: usize) -> Self {
         SAC::Hex(format!("{:02X}", value))
     }

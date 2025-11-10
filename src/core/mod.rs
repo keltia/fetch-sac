@@ -20,7 +20,18 @@ pub mod csv_output;
 pub mod parse;
 pub mod sac;
 
-/// Extract the HTML stuff from the page
+/// Extract areas and their associated SAC codes from an HTML page.
+///
+/// This function parses an HTML document containing SAC code information and extracts
+/// the areas along with their associated SAC codes. It processes tables within the document
+/// and handles special cases like embedded HTML tags in the data.
+///
+/// # Parameters
+/// * `doc` - HTML document as a string containing the SAC code information
+///
+/// # Returns
+/// * `Result<Vec<Area>>` - A vector of Area objects containing the parsed SAC code information,
+///   or an error if parsing fails
 ///
 pub fn scrape_data(doc: String) -> Result<Vec<Area>> {
     // Define a regex to sanitize some data, don't ask me why some entries have an embedded
