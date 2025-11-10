@@ -9,7 +9,7 @@ use nom::{
     branch::alt,
     bytes::complete::{tag_no_case, take_until},
     character::complete::multispace0,
-    sequence::{delimited, terminated, tuple},
+    sequence::{delimited, terminated},
     IResult, Parser,
 };
 use scraper::{Html, Selector};
@@ -57,11 +57,11 @@ fn parse_strong(input: &str) -> IResult<&str, &str> {
 }
 
 fn parse_two(input: &str) -> IResult<&str, (&str, &str)> {
-    tuple((parse_td, parse_td))(input)
+    (parse_td, parse_td).parse(input)
 }
 
 fn parse_three(input: &str) -> IResult<&str, (&str, &str)> {
-    terminated(tuple((parse_td, parse_td)), parse_td).parse(input)
+    terminated((parse_td, parse_td), parse_td).parse(input)
 }
 
 /// Parses content within span tags.
