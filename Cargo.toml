@@ -27,12 +27,12 @@ csv = "1.4"
 log = { version = "0.4", features = ["serde", "std"] }
 nom = "8"
 regex = "1.12"
-reqwest = { version = "0.12", features = ["blocking"] }
+reqwest = { version = "0.13", features = ["blocking"] }
 scraper = "0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["preserve_order"] }
 stderrlog = "0.6"
 
 [dev-dependencies]
-assert_cmd = { version = "2.1", features = ["color-auto"] }
+assert_cmd = { version = "2.2", features = ["color-auto"] }
 rstest = "0.26"
