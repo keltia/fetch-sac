@@ -7,8 +7,8 @@ use std::fs;
 use std::time::Instant;
 
 use anyhow::Result;
-use chrono::Utc;
 use clap::Parser;
+use jiff::Zoned;
 use log::{debug, info};
 use reqwest::blocking::get;
 use stderrlog::LogLevelNum::{Debug, Error, Info, Trace};
@@ -100,6 +100,9 @@ fn main() -> Result<()> {
         _ => println!("{}", data),
     }
 
-    info!("Information retrieved on: {}", Utc::now());
+    info!(
+        "Information retrieved on: {}",
+        Zoned::now().strftime("%Y-%m-%d %H:%M:%S")
+    );
     Ok(())
 }

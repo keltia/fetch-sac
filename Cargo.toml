@@ -21,7 +21,7 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 anyhow = "1.0"
-chrono = "0.4"
+jiff = "0.2"
 clap = { version = "4", features = ["cargo", "derive"] }
 csv = "1.4"
 log = { version = "0.4", features = ["serde", "std"] }
