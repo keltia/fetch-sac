@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 // ----------------------------------
 #[allow(clippy::upper_case_acronyms)]
 
-/// Either  regular hex string or a range
+/// Either a regular hex string or a range
 ///
 /// Represents a System Area Code (SAC) which can be either a single hex value,
 /// a range of values, or empty.
@@ -29,16 +29,15 @@ pub enum SAC {
 impl SAC {
     /// Creates a new empty SAC code.
     ///
-    /// # Returns
-    /// Returns a `SAC::Empty` variant.
+    #[allow(dead_code)]
     pub fn new() -> Self {
-        SAC::Empty
+        SAC::default()
     }
 }
 
 impl Default for SAC {
     fn default() -> Self {
-        SAC::new()
+        SAC::Empty
     }
 }
 
