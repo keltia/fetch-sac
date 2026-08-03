@@ -14,6 +14,9 @@ keywords = ["sac", "asterix", "aeronautical-data"]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
+[lints.rust]
+linker_messages = "allow"
+
 [badges]
 maintenance = { status = "actively-developed" }
 
